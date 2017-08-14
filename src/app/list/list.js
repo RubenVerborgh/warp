@@ -1251,3 +1251,23 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     $modalInstance.dismiss('cancel');
   };
 };
+
+// Perform jQuery AJAX request through the Solid Auth Client
+$.ajaxTransport('+*', function(options, originalOptions, jqXHR) {
+  return {
+    send: function(headers, callback) {
+      SolidAuthClient.fetch(options.url, options)
+      .then(function (response) {
+        var statusText = response.status === 200 ? 'success' : 'error';
+        var rawHeaders = '';
+        response.headers.forEach(function (value, name) {
+          rawHeaders += name + ': ' + value + '\n';
+        });
+        response.text().then(function (text) {
+          callback(response.status, statusText, { text: text }, rawHeaders);
+        });
+      });
+    },
+    abort: function () { }
+  };
+});
